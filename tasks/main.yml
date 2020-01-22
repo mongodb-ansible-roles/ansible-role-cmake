@@ -1,0 +1,5 @@
+---
+- name: Install cmake
+  package:
+    name: cmake
+    state: present

@@ -1,0 +1,44 @@
+---
+- hosts: rhel8
+  tasks:
+    - name: Add Artifactory repos
+      yum_repository:
+        baseurl: "{{ item.baseurl }}"
+        description: "{{ item.description }}"
+        gpgcheck: "{{ item.gpgcheck }}"
+        name: "{{ item.name }}"
+      loop:
+        - baseurl: "https://{{ lookup('env', 'ARTIFACTORY_USERNAME') }}:{{ lookup('env', 'ARTIFACTORY_PASSWORD') }}@artifactory.corp.mongodb.com/artifactory/rpm/8/AppStream/x86_64/os"  # noqa 204
+          description: Artifactory RHEL 8 AppStream Packages
+          gpgcheck: false
+          name: rhel8appstream
+        - baseurl: "https://{{ lookup('env', 'ARTIFACTORY_USERNAME') }}:{{ lookup('env', 'ARTIFACTORY_PASSWORD') }}@artifactory.corp.mongodb.com/artifactory/rpm/8/BaseOS/x86_64/os"  # noqa 204
+          description: Artifactory RHEL 8 BaseOS Packages
+          gpgcheck: false
+          name: rhel8baseos
+
+- hosts: all,!rhel8
+  tasks:
+    - name: Install prerequisite packages
+      package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - g++
+        - gcc
+        - git
+        - libssl-dev
+        - make
+
+- hosts: rhel8
+  tasks:
+    - name: Install prerequisite packages
+      package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - gcc-c++
+        - gcc
+        - git
+        - make
+        - openssl-devel

@@ -16,7 +16,7 @@ Role Variables
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-------:|:--------:|
-| name | desc | type | default | required |
+| `cmake_version` | Version of cmake to download | string | "" | `true` |
 
 Dependencies
 ------------
@@ -31,20 +31,8 @@ Example Playbook
   roles:
     - role: ansible-role-cmake
       vars:
+        cmake_version: v3.16.8
 ```
-
-Development
------------
-
-Testing this role locally requires the CircleCI [Local CLI](https://circleci.com/docs/2.0/local-cli/).
-
-To install the CLI for macOS and Linux, invoke the following command:
-
-    $ curl -fLSs https://circle.ci/cli | DESTDIR=/usr/local/bin bash
-
-After installing the CLI, invoke the following command to run the Molecule tests:
-
-    $ make test
 
 License
 -------

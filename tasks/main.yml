@@ -1,5 +1,39 @@
 ---
-- name: Install cmake
-  package:
-    name: cmake
-    state: present
+- name: Check if cmake is already installed
+  stat:
+    path: /usr/local/bin/cmake
+  register: is_cmake_exist
+
+- name: Check cmake version if installed  # noqa 306
+  shell: /usr/local/bin/cmake --version | sed -n '1p' | awk '{print $3}'
+  changed_when: false
+  register: is_cmake_version
+  when: is_cmake_exist.stat.exists
+
+- name: Run cmake installation
+  block:
+    - name: Download cmake source from GitHub version {{ cmake_version }}
+      git:
+        repo: https://github.com/Kitware/CMake.git
+        dest: /tmp/cmake
+        version: "{{ cmake_version }}"
+
+    - name: Run bootstrap
+      command: ./bootstrap
+      args:
+        chdir: /tmp/cmake
+
+    - name: Run make
+      make:
+        chdir: /tmp/cmake
+
+    - name: Check if cmake is installed
+      stat:
+        path: /usr/local/bin/cmake
+
+    - name: Run make install
+      become: true
+      make:
+        chdir: /tmp/cmake
+        target: install
+  when: not is_cmake_exist.stat.exists or cmake_version[1:] is version(is_cmake_version.stdout, "!=")

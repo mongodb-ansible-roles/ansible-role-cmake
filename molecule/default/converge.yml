@@ -4,3 +4,5 @@
   hosts: all
   roles:
     - role: ansible-role-cmake
+      vars:
+        cmake_version: v3.16.8
